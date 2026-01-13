@@ -41,6 +41,20 @@ This app provides a clean interface to search and explore supplement products us
 
 ```
 src/
+├── api/                     # API service layer
+│   ├── client.ts            # Generic HTTP fetch wrapper
+│   ├── supplements.ts       # Open Food Facts API endpoints
+│   ├── mapper.ts            # API response → App type converters
+│   └── index.ts             # Barrel exports
+│
+├── hooks/                   # Custom React hooks
+│   ├── useLocalStorage.ts   # Generic localStorage state management
+│   ├── useFavorites.ts      # Favorites management (localStorage)
+│   ├── useRecentSearches.ts # Search history tracking (localStorage)
+│   ├── useSupplementSearch.ts # Search API with loading/error states
+│   ├── useSupplementDetail.ts # Single supplement fetch
+│   └── index.ts             # Barrel exports
+│
 ├── components/              # UI components (presentational)
 │   ├── SearchBar.tsx
 │   ├── SupplementCard.tsx
@@ -68,17 +82,39 @@ src/
 │
 ├── types/                   # TypeScript definitions
 │   ├── supplement.ts        # App data models
-│   └── api.ts              # API response types
+│   └── api.ts               # API response types
 │
 ├── layout/                  # Layout components
 │   └── AppLayout.tsx
 │
-├── routes/                  # Router configuration
-│   └── router.tsx
-│
-└── [hooks/]                 # Custom React hooks (coming soon)
-    └── [services/]          # API and data mappers (coming soon)
+└── routes/                  # Router configuration
+    └── router.tsx
 ```
+
+## Architecture
+
+### Custom Hooks
+The app uses custom React hooks for state management and data fetching. Hooks are composable - complex hooks build on simpler ones:
+
+**Storage Hooks:**
+- `useLocalStorage` - Base hook for localStorage persistence with reactive state
+- `useFavorites` - Builds on useLocalStorage to manage favorites (add, remove, toggle, check)
+- `useRecentSearches` - Builds on useLocalStorage to track search history (max 10, most recent first)
+
+**API Hooks:**
+- `useSupplementSearch(query, page)` - Search supplements with loading/error states, auto-refetches when query/page changes
+- `useSupplementDetail(id)` - Fetch single supplement details with loading/error states
+
+All hooks return clean, typed data and handle edge cases internally.
+
+### API Service Layer
+Three-layer architecture for API integration:
+
+1. **Client Layer** (`api/client.ts`) - Generic fetch wrapper with error handling
+2. **Domain Layer** (`api/supplements.ts`) - Supplement-specific API endpoints
+3. **Mapper Layer** (`api/mapper.ts`) - Converts API response types to app domain types
+
+This separation allows easy API swapping and keeps components independent of external API structure.
 
 ## Data Model
 
@@ -147,23 +183,28 @@ The app runs at `http://localhost:5173` (default Vite port)
 - Project setup (React + TypeScript + Vite)
 - React Router configuration with 5 routes
 - Component library (16 presentational components)
-- TypeScript type definitions for data models
-- API response type definitions
+- TypeScript type definitions (data models + API response types)
+- **API service layer** (client, supplements endpoints, response mappers)
+- **Custom React hooks**:
+  - `useLocalStorage` - Generic localStorage state management
+  - `useFavorites` - Favorites management with localStorage persistence
+  - `useRecentSearches` - Recent search tracking with localStorage
+  - `useSupplementSearch` - Search API with loading/error states
+  - `useSupplementDetail` - Single supplement fetch with loading/error states
 
-### 🚧 In Progress
-- Page implementations
-- Custom hooks for data fetching and state management
-- API service layer with Open Food Facts integration
-- Styling and responsive design
+### 🚧 Next Up
+- Add Tailwind CSS for styling
+- Wire up pages with hooks and data fetching
+- Implement responsive design
+- Connect components to hooks (SearchBar, SupplementCard, etc.)
 
 ### 📋 Todo
-- Implement custom hooks (useFavorites, useSupplementSearch, etc.)
-- Build API service and mapper functions
-- Wire up pages with data fetching
-- Add CSS/styling
-- Skeleton loading states
-- Error handling
-- localStorage persistence for favorites and recent searches
+- Style components with Tailwind
+- Implement page logic (SearchPage, SearchResultsPage, etc.)
+- Add loading skeleton states to pages
+- Error boundary implementation
+- Accessibility improvements (ARIA labels, keyboard nav)
+- Testing (unit tests for hooks, integration tests for pages)
 
 ## Design Principles
 
