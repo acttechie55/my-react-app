@@ -1,4 +1,4 @@
-import { NutritionalInfo } from '../types/supplement';
+import type { NutritionalInfo } from '../types/supplement';
 
 interface NutritionalInfoTableProps {
   nutritionalInfo: NutritionalInfo;

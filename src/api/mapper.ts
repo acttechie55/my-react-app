@@ -55,13 +55,14 @@ function parseCategories(categoriesText?: string): string[] {
 function extractDietaryTags(product: OpenFoodFactsProduct): DietaryTags {
   // Check categories and ingredients for keywords
   const categories = product.categories?.toLowerCase() || '';
-  const ingredients = product.ingredients_text?.toLowerCase() || '';
+  const ingredientsText = product.ingredients_text?.toLowerCase() || '';
 
   return {
     vegan: categories.includes('vegan') || categories.includes('plant-based'),
     vegetarian: categories.includes('vegetarian') || categories.includes('vegan'),
-    glutenFree: categories.includes('gluten-free') || categories.includes('gluten free'),
-    organic: categories.includes('organic'),
+    glutenFree: categories.includes('gluten-free') || categories.includes('gluten free') ||
+                ingredientsText.includes('gluten-free'),
+    organic: categories.includes('organic') || ingredientsText.includes('organic'),
   };
 }
 
