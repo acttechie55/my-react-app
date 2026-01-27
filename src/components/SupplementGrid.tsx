@@ -1,6 +1,12 @@
 import type { Supplement } from '../types/supplement';
 import SupplementCard from './SupplementCard';
 
+/**
+ * SupplementGrid Component
+ *
+ * Displays a responsive grid of supplement cards.
+ */
+
 interface SupplementGridProps {
   supplements: Supplement[];
   onFavoriteToggle: (id: string) => void;
@@ -10,7 +16,7 @@ interface SupplementGridProps {
 
 function SupplementGrid({ supplements, onFavoriteToggle, favorites, onCardClick }: SupplementGridProps) {
   return (
-    <div className="supplement-grid">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {supplements.map((supplement) => (
         <SupplementCard
           key={supplement.id}
