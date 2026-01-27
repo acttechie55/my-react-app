@@ -196,12 +196,13 @@ The app runs at `http://localhost:5173` (default Vite port)
 - **SearchPage** - Wired up with useRecentSearches, navigation, and Tailwind styling
 - **SearchResultsPage** - Wired up with useSupplementSearch, useFavorites, URL params, pagination, and conditional rendering
 - **Styled components** - SearchBar, RecentSearches, SupplementCard, SupplementGrid, FavoriteButton, Pagination, EmptyState, ErrorMessage, SkeletonSupplementCard
+- **Header component** - Global navigation with active link highlighting and favorites badge
+- **AppLayout** - Layout wrapper with Header and Outlet for nested routes
+- **API fixes** - Removed Content-Type header from GET requests, removed slow category filter
 
 ### 🚧 Next Up
 - Wire up SupplementDetailPage with useSupplementDetail hook
 - Wire up FavoritesPage with useFavorites hook
-- Add Header component with navigation
-- Test complete data flow when API is available
 
 ### 📋 Todo
 - Error boundary implementation

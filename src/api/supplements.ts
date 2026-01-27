@@ -47,10 +47,8 @@ export async function searchSupplements(
     page: page.toString(),
     page_size: pageSize.toString(),
     json: '1', // Request JSON response
-    // Filter to supplements category to get more relevant results
-    tagtype_0: 'categories',
-    tag_contains_0: 'contains',
-    tag_0: 'supplements',
+    // Note: Category filter removed - was causing server timeouts
+    // Can add back later: tagtype_0=categories, tag_contains_0=contains, tag_0=supplements
   });
 
   // Construct full URL

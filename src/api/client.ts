@@ -40,12 +40,9 @@ export class ApiError extends Error {
 export async function get<T>(url: string, options?: RequestInit): Promise<T> {
   try {
     // Make the fetch request
+    // Note: No Content-Type header for GET requests (no body to describe)
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers, // Merge any custom headers
-      },
       ...options, // Merge any other options
     });
 

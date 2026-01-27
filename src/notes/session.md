@@ -1,76 +1,48 @@
-## Last Session Summary (2026-01-26)
+## Last Session Summary (2026-01-27)
 
 ### What We Completed:
 
-#### 1. Tailwind CSS 4 Setup
-- Installed tailwindcss, postcss, autoprefixer, @tailwindcss/postcss
-- Created `tailwind.config.js` and `postcss.config.js`
-- Updated `index.css` with Tailwind v4 CSS-first syntax (`@import "tailwindcss"`)
-- Fixed TypeScript errors for strict mode compatibility
+#### 1. Fixed API Issues
+- **Content-Type header bug**: Removed `Content-Type: application/json` from GET requests - was causing "Failed to fetch" errors
+- **Category filter timeout**: Removed supplements category filter that was causing server timeouts
+- API now works correctly with Open Food Facts
 
-#### 2. SearchPage Implementation (`src/pages/SearchPage.tsx`)
-- Connected to `useRecentSearches` hook for search history
-- Connected to `useNavigate` for programmatic navigation
-- Wired up SearchBar component with controlled input pattern
-- Wired up RecentSearches component with click handling
-- Full Tailwind styling with responsive layout
+#### 2. Header Component (`src/components/Header.tsx`)
+- Styled with Tailwind CSS
+- Navigation links: Home, Favorites
+- Active link highlighting using `useLocation()`
+- Favorites badge with count (red pill, only shows when > 0)
+- Sticky positioning at top of page
+- Logo links to home page
 
-#### 3. SearchResultsPage Implementation (`src/pages/SearchResultsPage.tsx`)
-- Connected to `useSearchParams` for URL query parameters (q, page)
-- Connected to `useSupplementSearch` hook for API calls
-- Connected to `useFavorites` hook for favorites management
-- Conditional rendering for loading/error/empty/success states
-- Pagination handling with URL state
-- Navigation to detail pages on card click
+#### 3. AppLayout (`src/layout/AppLayout.tsx`)
+- Layout wrapper that contains Header
+- Uses `<Outlet />` for nested route rendering
+- All pages now render inside this layout
 
-#### 4. Component Styling with Tailwind
-Styled the following components:
-- **SearchBar.tsx** - Input with focus states, clear button, submit button
-- **RecentSearches.tsx** - Pill-shaped chips with hover effects
-- **SupplementCard.tsx** - Card with image, hover effects, favorite button
-- **SupplementGrid.tsx** - Responsive grid (1→2→3→4 columns)
-- **FavoriteButton.tsx** - Heart button with size variants
-- **Pagination.tsx** - Page navigation with disabled states
-- **EmptyState.tsx** - Centered message with optional action
-- **ErrorMessage.tsx** - Error display with retry button
-- **SkeletonSupplementCard.tsx** - Loading placeholder with animate-pulse
+#### 4. Router Update (`src/routes/router.tsx`)
+- Changed to nested routes pattern
+- AppLayout is parent route, all pages are children
+- Uses `index: true` for home route (like Angular's `pathMatch: 'full'`)
 
 ### Key React Concepts Learned:
 
-1. **useSearchParams** - Reading/writing URL query parameters
-   - Angular equivalent: ActivatedRoute.queryParams
-   - Returns `[searchParams, setSearchParams]` tuple
-   - Updates URL without full page reload
+1. **`<Link to="/path">`** - Declarative navigation (like Angular's routerLink)
+2. **`useLocation()`** - Get current URL info (like Angular's Router.url)
+3. **`<Outlet />`** - Renders matched child route (like Angular's `<router-outlet>`)
+4. **`index: true`** - Default child route (like Angular's `pathMatch: 'full'`)
+5. **Nested routes** - Parent layout wraps child pages
 
-2. **Conditional Rendering Patterns**
-   - `{loading && <Skeleton />}` - Show while loading
-   - `{!loading && error && <Error />}` - Show on error
-   - `{!loading && !error && data && <Results />}` - Show on success
-   - Angular equivalent: *ngIf directives
-
-3. **URL as State** - The URL is the "source of truth" for search query and page
-   - Changing URL params triggers hook re-fetch
-   - Users can bookmark/share search results
-
-4. **Tailwind CSS v4** - New CSS-first approach
-   - Uses `@import "tailwindcss"` instead of old `@tailwind` directives
-   - Requires `@tailwindcss/postcss` package
-
-### API Note:
-Open Food Facts API was experiencing timeouts during testing. The code is correctly wired and will work when the API recovers.
+### API Learning:
+- GET requests should NOT have `Content-Type` header (no body to describe)
+- Angular's HttpClient handles this automatically; manual fetch requires care
 
 ## Next Steps
 
 1. **Wire up SupplementDetailPage** with useSupplementDetail hook
 2. **Wire up FavoritesPage** with useFavorites hook
-3. **Add Header component** with navigation links
-4. **Test complete flow** when API is available
 
 ## Previous Sessions
+- 2026-01-26: Tailwind CSS, SearchPage, SearchResultsPage wiring
 - 2026-01-19: API service layer and custom hooks
 - 2026-01-13: Initial project setup
-
-## Reference Files:
-- Pages: `src/pages/SearchPage.tsx`, `src/pages/SearchResultsPage.tsx`
-- Components: All files in `src/components/` now have Tailwind styling
-- Hooks: All hooks in `src/hooks/` are complete and working

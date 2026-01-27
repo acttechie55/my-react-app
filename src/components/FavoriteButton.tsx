@@ -18,7 +18,7 @@ interface FavoriteButtonProps {
 function FavoriteButton({ isFavorite, onToggle, size = 'large' }: FavoriteButtonProps) {
   // Size-specific classes
   const sizeClasses = size === 'small'
-    ? 'p-1.5 text-xl'
+    ? 'p-1.5 text-xs'
     : 'p-2 text-2xl';
 
   return (
