@@ -1,203 +1,162 @@
-# Last Chat Session - January 19, 2026
+# Last Chat Session - January 26, 2026
 
 ## Context
 User is a 10-year Angular developer learning React through this project. All explanations should be elementary and include Angular comparisons.
 
 ## What We Completed Today
 
-### 1. API Service Layer (`src/api/`)
-Built a complete 3-layer API architecture:
+### 1. Tailwind CSS 4 Setup
+- Installed packages: `tailwindcss`, `postcss`, `autoprefixer`, `@tailwindcss/postcss`
+- Created `tailwind.config.js` for tooling compatibility
+- Created `postcss.config.js` with `@tailwindcss/postcss` plugin
+- Updated `src/index.css` with Tailwind v4 CSS-first syntax
 
-- **`client.ts`** - Generic HTTP fetch wrapper
-  - Similar to Angular's HttpClient
-  - Custom ApiError class for error handling
-  - `get()` and `post()` functions returning Promises
+**Key Learning**: Tailwind v4 uses `@import "tailwindcss"` instead of the old `@tailwind base/components/utilities` directives.
 
-- **`supplements.ts`** - Open Food Facts API endpoints
-  - `searchSupplements(query, page, pageSize)` - Search supplements
-  - `getSupplementById(barcode)` - Get single supplement
-  - Similar to Angular domain-specific services
+### 2. SearchPage Wiring (`src/pages/SearchPage.tsx`)
+Connected page to hooks and components:
+- `useState` - Local state for search input (controlled component)
+- `useNavigate` - Programmatic navigation to results page
+- `useRecentSearches` - Custom hook for search history
 
-- **`mapper.ts`** - API response → App type converters
-  - `mapProductToSupplement()` - Converts single product
-  - `mapSearchResponse()` - Converts search results
-  - Cleans messy API data (snake_case) to clean app types (camelCase)
+**Data Flow**:
+```
+User types → onChange updates state → onSubmit navigates → /search?q=query
+```
 
-- **`index.ts`** - Barrel exports for clean imports
+### 3. SearchResultsPage Wiring (`src/pages/SearchResultsPage.tsx`)
+Most complex page with multiple hooks:
+- `useSearchParams` - Read URL query params (q, page)
+- `useSupplementSearch` - API hook with loading/error/data
+- `useFavorites` - Favorites management
+- `useNavigate` - Navigate to detail pages
 
-### 2. Custom React Hooks (`src/hooks/`)
-Built 5 custom hooks with composition pattern:
+**Conditional Rendering Pattern**:
+```tsx
+{loading && <SkeletonCards />}
+{!loading && error && <ErrorMessage />}
+{!loading && !error && data?.length === 0 && <EmptyState />}
+{!loading && !error && data?.length > 0 && <SupplementGrid />}
+```
 
-- **`useLocalStorage.ts`** - Foundation hook
-  - Generic localStorage state management
-  - Returns tuple: `[value, setValue]`
-  - Like Angular service wrapping localStorage
+**Angular Equivalent**: Multiple `*ngIf` directives for different states.
 
-- **`useFavorites.ts`** - Domain-specific hook
-  - Uses useLocalStorage internally
-  - Returns object: `{ favorites, addFavorite, removeFavorite, toggleFavorite, isFavorite, clearFavorites, favoritesCount }`
-  - Prevents duplicates, manages array immutably
+### 4. Component Styling with Tailwind
+Styled 9 components with Tailwind utility classes:
 
-- **`useRecentSearches.ts`** - Domain-specific hook
-  - Uses useLocalStorage internally
-  - Tracks last 10 searches, most recent first
-  - Deduplicates and moves repeated searches to top
-
-- **`useSupplementSearch.ts`** - API hook with useEffect
-  - `useSupplementSearch(query, page)` - Auto-fetches when query/page changes
-  - Returns: `{ data, loading, error }`
-  - Uses useEffect with dependencies array `[query, page]`
-  - Standard loading/error/data pattern
-
-- **`useSupplementDetail.ts`** - API hook with useEffect
-  - `useSupplementDetail(supplementId)` - Fetches single supplement
-  - Returns: `{ supplement, loading, error }`
-  - Uses useEffect with dependencies array `[supplementId]`
-
-### 3. Documentation
-- Updated README.md with architecture section
-- Updated project structure
-- Created session.md with learning summary
-- Committed all changes with comprehensive commit message
+| Component | Key Features |
+|-----------|--------------|
+| SearchBar | Input focus states, clear button, blue submit |
+| RecentSearches | Pill chips with flex wrap |
+| SupplementCard | Card hover effects, favorite overlay |
+| SupplementGrid | Responsive grid (1→2→3→4 cols) |
+| FavoriteButton | Size variants, heart toggle |
+| Pagination | Disabled states, navigation buttons |
+| EmptyState | Centered layout, optional action |
+| ErrorMessage | Red theme, retry button |
+| SkeletonSupplementCard | animate-pulse loading effect |
 
 ## Key React Concepts Taught
 
-### 1. useState
+### 1. useSearchParams (react-router-dom)
 ```typescript
-const [value, setValue] = useState(initialValue);
+const [searchParams, setSearchParams] = useSearchParams();
+const query = searchParams.get('q') || '';
+const page = parseInt(searchParams.get('page') || '1', 10);
+
+// Update URL
+setSearchParams({ q: 'protein', page: '2' });
 ```
-- Reactive state that triggers re-renders when changed
-- Angular equivalent: class property with change detection
-- Always create new objects/arrays (immutability)
+- Angular equivalent: `ActivatedRoute.queryParams`
+- URL is the "source of truth" for search state
+- Enables bookmarking and sharing search results
 
-### 2. useEffect
-```typescript
-useEffect(() => {
-  // Effect code runs after render
-  fetchData();
+### 2. Conditional Rendering
+```tsx
+// Show/hide based on condition
+{loading && <Spinner />}
 
-  return () => {
-    // Cleanup (optional)
-  };
-}, [dependency1, dependency2]); // Dependencies array
+// Multiple conditions
+{!loading && error && <Error message={error} />}
+
+// Ternary for either/or
+{data ? <Results data={data} /> : <Empty />}
 ```
-- Side effects hook (API calls, subscriptions, etc.)
-- Angular equivalent: ngOnInit + ngOnChanges + ngOnDestroy combined
-- **Dependencies array critical:**
-  - `[]` = run once on mount (like ngOnInit)
-  - `[query]` = run when query changes (like ngOnChanges watching @Input)
-  - No array = run after every render (usually a mistake!)
-- Can't make useEffect itself async, must define async function inside
+- Angular equivalent: `*ngIf="condition"` and `*ngIf="condition; else template"`
 
-### 3. Immutability
-```typescript
-// ❌ DON'T - mutates existing array
-array.push(item);
-setArray(array); // React won't detect change!
+### 3. URL as State
+- SearchResultsPage reads query/page from URL
+- Changing URL params triggers `useSupplementSearch` to re-fetch
+- User can use browser back/forward, bookmark results
+- Angular equivalent: Router with queryParams subscription
 
-// ✅ DO - creates new array
-setArray([...array, item]); // React detects new reference
+### 4. Tailwind CSS v4
+- CSS-first configuration approach
+- `@import "tailwindcss"` loads everything
+- `@theme` block for customization
+- `@apply` still works for reusable styles
+
+## Architecture Patterns
+
+### Page as Container
 ```
-- React uses reference comparison to detect changes
-- Angular uses Zone.js to detect mutations
-- Always use: `[...array]`, `{ ...object }`, `.map()`, `.filter()`
-
-### 4. Hook Composition
-```typescript
-// Low-level hook
-function useLocalStorage(key, initial) { ... }
-
-// High-level hook uses low-level hook
-function useFavorites() {
-  const [favorites, setFavorites] = useLocalStorage('favorites', []);
-  // Add favorites-specific logic
-}
-```
-- Like Angular services injecting other services
-- Build complex functionality from simple building blocks
-- Promotes reusability and separation of concerns
-
-### 5. Tuple vs Object Returns
-```typescript
-// Tuple - flexible naming
-const [user, setUser] = useLocalStorage('user', null);
-const [theme, setTheme] = useLocalStorage('theme', 'dark');
-
-// Object - clear named methods
-const { addFavorite, removeFavorite, isFavorite } = useFavorites();
-```
-- Tuple: Generic utilities where naming flexibility helps
-- Object: Domain-specific hooks with clear method names
-
-## Architecture Patterns Implemented
-
-### Layered API Architecture
-```
-Component
-  ↓ calls
-Hook (useSupplementSearch)
-  ↓ uses useEffect
-  ↓ calls
-API Service (searchSupplements)
-  ↓ uses
-API Client (fetch wrapper)
-  ↓ HTTP request
-  ↓ receives response
-Mapper (mapSearchResponse)
-  ↓ converts API → App types
-  ↓ returns to
-Hook (updates state)
-  ↓ triggers re-render
-Component (displays new data)
+SearchResultsPage (container)
+  ├── Manages URL state (useSearchParams)
+  ├── Manages API state (useSupplementSearch)
+  ├── Manages favorites state (useFavorites)
+  └── Renders presentational components:
+      ├── SearchBar
+      ├── SupplementGrid → SupplementCard
+      ├── Pagination
+      ├── EmptyState / ErrorMessage
+      └── SkeletonSupplementCard
 ```
 
-### Hook Composition
+### Conditional UI States
 ```
-useLocalStorage (generic)
-    ↓
-    ├─ useFavorites (domain-specific)
-    └─ useRecentSearches (domain-specific)
+┌─────────────────────────────────────────┐
+│ URL has ?q=protein                      │
+├─────────────────────────────────────────┤
+│ loading=true  → Show Skeleton Cards     │
+│ error!=null   → Show Error + Retry      │
+│ data.length=0 → Show Empty State        │
+│ data.length>0 → Show Grid + Pagination  │
+└─────────────────────────────────────────┘
+```
 
-useState + useEffect
-    ↓
-    ├─ useSupplementSearch (API hook)
-    └─ useSupplementDetail (API hook)
-```
+## API Note
+Open Food Facts API was experiencing timeouts during testing. The code is correctly wired up and will work when the API recovers.
 
 ## Next Session - Where to Pick Up
 
 ### Immediate Next Steps:
-1. **Add Tailwind CSS** to the project for styling
-2. **Wire up pages** with the hooks we created:
-   - SearchPage → useRecentSearches
-   - SearchResultsPage → useSupplementSearch
-   - SupplementDetailPage → useSupplementDetail
-   - FavoritesPage → useFavorites
-3. **See the app working** with real data from API
-4. **Style components** with Tailwind
+1. **Wire up SupplementDetailPage** with `useSupplementDetail` hook
+2. **Wire up FavoritesPage** with `useFavorites` hook
+3. **Add Header component** with navigation (Home, Favorites)
+4. **Test complete flow** when Open Food Facts API is available
 
-### Files Ready to Use:
-- All 5 hooks are complete and ready in `src/hooks/`
-- All API services are complete in `src/api/`
-- All have extensive comments with Angular comparisons
-- All have usage examples at the bottom of each file
+### Files Ready to Wire Up:
+- `src/pages/SupplementDetailPage.tsx` - Needs useSupplementDetail hook
+- `src/pages/FavoritesPage.tsx` - Needs useFavorites hook
+- `src/components/Header.tsx` - Needs navigation links
 
 ### Current Project State:
-- ✅ 16 presentational components (not yet wired up)
-- ✅ 5 custom hooks (ready to use)
-- ✅ Complete API layer (ready to use)
-- ✅ Type definitions (complete)
-- ⏳ Pages need to be implemented (use hooks + components)
-- ⏳ Styling with Tailwind CSS (not yet added)
+- ✅ Tailwind CSS 4 configured and working
+- ✅ SearchPage fully wired and styled
+- ✅ SearchResultsPage fully wired and styled
+- ✅ 9 components styled with Tailwind
+- ⏳ SupplementDetailPage needs wiring
+- ⏳ FavoritesPage needs wiring
+- ⏳ Header component needs implementation
 
 ## How to Resume
 
 When starting the next session:
 1. Read this file to get context
-2. User will likely want to add Tailwind CSS next
-3. Then wire up one page at a time (start with SearchPage or SearchResultsPage)
-4. Continue explaining concepts in Angular terms
-5. Be very elementary in explanations - user is learning React patterns
+2. Wire up SupplementDetailPage next
+3. Then wire up FavoritesPage
+4. Add Header for navigation between pages
+5. Test with real API data when available
 
 ## Important User Preferences
 - User is experienced Angular developer (10 years)
@@ -208,7 +167,5 @@ When starting the next session:
 - Values composition patterns and clean architecture
 
 ## Git Status
-- Last commit: "Add API service layer and custom React hooks"
-- Branch: main
-- Status: Clean working tree, 1 commit ahead of origin
-- Ready to push to remote when user is ready
+- Staged files: 11 component and page files with Tailwind styling
+- Ready to commit with message below

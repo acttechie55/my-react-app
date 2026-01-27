@@ -12,6 +12,7 @@ This app provides a clean interface to search and explore supplement products us
 - **TypeScript** - Type safety
 - **Vite** - Build tool and dev server
 - **React Router 7** - Client-side routing
+- **Tailwind CSS 4** - Utility-first styling
 - **Open Food Facts API** - Product data source
 
 ## Features (MVP)
@@ -191,20 +192,22 @@ The app runs at `http://localhost:5173` (default Vite port)
   - `useRecentSearches` - Recent search tracking with localStorage
   - `useSupplementSearch` - Search API with loading/error states
   - `useSupplementDetail` - Single supplement fetch with loading/error states
+- **Tailwind CSS 4** - Utility-first styling configured
+- **SearchPage** - Wired up with useRecentSearches, navigation, and Tailwind styling
+- **SearchResultsPage** - Wired up with useSupplementSearch, useFavorites, URL params, pagination, and conditional rendering
+- **Styled components** - SearchBar, RecentSearches, SupplementCard, SupplementGrid, FavoriteButton, Pagination, EmptyState, ErrorMessage, SkeletonSupplementCard
 
 ### 🚧 Next Up
-- Add Tailwind CSS for styling
-- Wire up pages with hooks and data fetching
-- Implement responsive design
-- Connect components to hooks (SearchBar, SupplementCard, etc.)
+- Wire up SupplementDetailPage with useSupplementDetail hook
+- Wire up FavoritesPage with useFavorites hook
+- Add Header component with navigation
+- Test complete data flow when API is available
 
 ### 📋 Todo
-- Style components with Tailwind
-- Implement page logic (SearchPage, SearchResultsPage, etc.)
-- Add loading skeleton states to pages
 - Error boundary implementation
 - Accessibility improvements (ARIA labels, keyboard nav)
 - Testing (unit tests for hooks, integration tests for pages)
+- Add loading skeleton to detail page
 
 ## Design Principles
 
